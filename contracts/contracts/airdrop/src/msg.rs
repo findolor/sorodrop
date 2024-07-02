@@ -1,6 +1,6 @@
 use soroban_sdk::{contracttype, Address, BytesN, Env, Vec};
 
-use crate::{error::ContractError, storage};
+use crate::error::ContractError;
 
 pub trait InvokeMsg {
     fn initialize(env: Env, admin: Address, token_address: Address) -> Result<(), ContractError>;
@@ -46,7 +46,7 @@ pub struct AirdropResponse {
 }
 
 pub trait QueryMsg {
-    fn get_config(env: Env) -> Result<storage::config::Config, ContractError>;
+    fn get_config(env: Env) -> Result<(), ContractError>;
 
     fn get_airdrop(env: Env) -> Result<AirdropResponse, ContractError>;
 
