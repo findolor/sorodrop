@@ -2,7 +2,7 @@ use soroban_sdk::{contract, contractimpl, Address, BytesN, Env, Vec};
 
 use crate::{
     error::ContractError,
-    msg::{AirdropResponse, InvokeMsg, QueryMsg}
+    msg::{AirdropResponse, InvokeMsg, QueryMsg}, storage
 };
 
 #[contract]
@@ -64,8 +64,8 @@ impl InvokeMsg for SorodropAirdrop {
 
 #[contractimpl]
 impl QueryMsg for SorodropAirdrop {
-    fn get_config(env: Env) -> Result<(), ContractError> {
-        Ok(())
+    fn get_config(env: Env) -> Result<storage::config::Config, ContractError> {
+        Ok(storage::config::get_config(&env)?)
     }
 
     fn get_airdrop(env: Env) -> Result<AirdropResponse, ContractError> {
