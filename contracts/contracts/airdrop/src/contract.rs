@@ -12,6 +12,12 @@ pub struct SorodropAirdrop;
 #[contractimpl]
 impl InvokeMsg for SorodropAirdrop {
     fn initialize(env: Env, admin: Address, token_address: Address) -> Result<(), ContractError> {
+        if storage::config::has_config(&env) {
+            return Err(ContractError::AlreadyInitialized {});
+        }
+
+        storage::config::set_config(&env, admin, token_address);
+
         Ok(())
     }
 
