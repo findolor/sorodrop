@@ -26,6 +26,12 @@ impl InvokeMsg for SorodropAirdrop {
         admin: Address,
         token_address: Address,
     ) -> Result<(), ContractError> {
+        let config = storage::config::get_config(&env)?;
+
+        config.admin.require_auth();
+
+        storage::config::set_config(&env, admin, token_address);
+
         Ok(())
     }
 
