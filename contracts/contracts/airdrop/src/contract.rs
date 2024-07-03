@@ -2,7 +2,8 @@ use soroban_sdk::{contract, contractimpl, Address, BytesN, Env, Vec};
 
 use crate::{
     error::ContractError,
-    msg::{AirdropResponse, InvokeMsg, QueryMsg}, storage
+    msg::{AirdropResponse, InvokeMsg, QueryMsg},
+    storage,
 };
 
 #[contract]
@@ -45,11 +46,7 @@ impl InvokeMsg for SorodropAirdrop {
         Ok(())
     }
 
-    fn clawback(
-        env: Env,
-        recipient: Address,
-        amount: i128,
-    ) -> Result<(), ContractError> {
+    fn clawback(env: Env, recipient: Address, amount: i128) -> Result<(), ContractError> {
         Ok(())
     }
 

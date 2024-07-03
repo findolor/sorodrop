@@ -25,11 +25,7 @@ pub trait InvokeMsg {
 
     fn burn(env: Env, amount: i128) -> Result<(), ContractError>;
 
-    fn clawback(
-        env: Env,
-        recipient: Address,
-        amount: i128,
-    ) -> Result<(), ContractError>;
+    fn clawback(env: Env, recipient: Address, amount: i128) -> Result<(), ContractError>;
 
     fn pause(env: Env) -> Result<(), ContractError>;
 
