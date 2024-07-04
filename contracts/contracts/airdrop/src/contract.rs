@@ -109,6 +109,6 @@ impl QueryMsg for SorodropAirdrop {
     }
 
     fn get_is_paused(env: Env) -> Result<bool, ContractError> {
-        Ok(true)
+        Ok(storage::airdrop::get_paused(&env)?)
     }
 }

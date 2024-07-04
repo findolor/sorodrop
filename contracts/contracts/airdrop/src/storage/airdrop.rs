@@ -47,6 +47,6 @@ pub fn set_paused(env: &Env, value: bool) {
     env.storage().instance().set(&DataKey::Paused, &value);
 }
 
-pub fn get_stage_paused(env: &Env, stage: u32) -> Result<bool, ContractError> {
+pub fn get_paused(env: &Env) -> Result<bool, ContractError> {
     env.storage().instance().get(&DataKey::Paused).unwrap()
 }
