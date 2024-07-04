@@ -63,10 +63,20 @@ impl InvokeMsg for SorodropAirdrop {
     }
 
     fn pause(env: Env) -> Result<(), ContractError> {
+        let config = storage::config::get_config(&env)?;
+        config.admin.require_auth();
+
+        storage::airdrop::set_paused(&env, true);
+
         Ok(())
     }
 
     fn resume(env: Env) -> Result<(), ContractError> {
+        let config = storage::config::get_config(&env)?;
+        config.admin.require_auth();
+
+        storage::airdrop::set_paused(&env, false);
+
         Ok(())
     }
 }
