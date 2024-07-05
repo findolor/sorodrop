@@ -4,6 +4,7 @@ use crate::{
     error::ContractError,
     msg::{AirdropResponse, InvokeMsg, QueryMsg},
     storage,
+    utils::check_timestamp_validity,
 };
 
 #[contract]
@@ -39,9 +40,27 @@ impl InvokeMsg for SorodropAirdrop {
         env: Env,
         merkle_root: BytesN<32>,
         total_amount: i128,
-        start: Option<u64>,
-        expiration: Option<u64>,
+        start_time: Option<u64>,
+        end_time: Option<u64>,
     ) -> Result<(), ContractError> {
+        let config = storage::config::get_config(&env)?;
+        config.admin.require_auth();
+
+        // TODO: Save merkle root
+
+        check_timestamp_validity(&env, start_time, end_time)?;
+
+        storage::airdrop::set_start_time(&env, start_time);
+        storage::airdrop::set_end_time(&env, end_time);
+
+        storage::airdrop::set_paused(&env, false);
+
+        storage::airdrop::set_amount(&env, total_amount);
+
+        storage::claim::set_total_claimed(&env, 0);
+
+        storage::claim::set_admin_claim(&env, 0);
+
         Ok(())
     }
 
