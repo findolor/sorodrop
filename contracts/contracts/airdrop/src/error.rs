@@ -7,4 +7,6 @@ pub enum ContractError {
     // Initialization errors
     NotInitialized = 1,
     AlreadyInitialized = 2,
+    // Claim errors
+    UserClaimNotFound = 3,
 }
