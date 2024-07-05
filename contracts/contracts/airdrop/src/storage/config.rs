@@ -32,16 +32,6 @@ pub fn get_config(env: &Env) -> Result<Config, ContractError> {
     env.storage().instance().get(&DataKey::Config).unwrap()
 }
 
-pub fn update_config(env: &Env, admin: Address, token_address: Address) {
-    env.storage().instance().set(
-        &DataKey::Config,
-        &Config {
-            admin,
-            token_address,
-        },
-    );
-}
-
 pub fn has_config(e: &Env) -> bool {
     e.storage().instance().has(&DataKey::Config)
 }
