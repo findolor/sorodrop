@@ -9,4 +9,7 @@ pub enum ContractError {
     AlreadyInitialized = 2,
     // Claim errors
     UserClaimNotFound = 3,
+    // Time period errors
+    InvalidStartTime = 4,
+    InvalidEndTime = 5,
 }
