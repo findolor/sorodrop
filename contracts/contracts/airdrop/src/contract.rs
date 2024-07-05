@@ -97,15 +97,19 @@ impl QueryMsg for SorodropAirdrop {
     }
 
     fn get_is_claimed(env: Env, recipient: Address) -> Result<bool, ContractError> {
-        Ok(true)
+        Ok(storage::claim::get_user_claim(&env, recipient).is_ok())
     }
 
     fn get_total_claimed(env: Env) -> Result<i128, ContractError> {
-        Ok(0)
+        Ok(storage::claim::get_total_claimed(&env))
     }
 
     fn get_remaining_amount(env: Env) -> Result<i128, ContractError> {
-        Ok(0)
+        let total_amount = storage::airdrop::get_amount(&env)?;
+        let total_claimed = storage::claim::get_total_claimed(&env);
+        let admin_claim = storage::claim::get_admin_claim(&env)?;
+
+        Ok(total_amount - total_claimed - admin_claim)
     }
 
     fn get_is_paused(env: Env) -> Result<bool, ContractError> {
