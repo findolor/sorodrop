@@ -1,4 +1,4 @@
-use soroban_sdk::{contract, contractimpl, Address, BytesN, Env, Vec};
+use soroban_sdk::{contract, contractimpl, token, Address, BytesN, Env, Vec};
 
 use crate::{
     error::ContractError,
@@ -70,6 +70,44 @@ impl InvokeMsg for SorodropAirdrop {
         amount: i128,
         merkle_proofs: Vec<BytesN<32>>,
     ) -> Result<(), ContractError> {
+        storage::config::get_config(&env)?;
+
+        recipient.require_auth();
+
+        let current_timestamp = env.ledger().timestamp();
+
+        if let Some(start_time) = storage::airdrop::get_start_time(&env)? {
+            if current_timestamp < start_time {
+                return Err(ContractError::AirdropNotBegun {});
+            }
+        }
+        if let Some(end_time) = storage::airdrop::get_end_time(&env)? {
+            if current_timestamp > end_time {
+                return Err(ContractError::AirdropExpired {});
+            }
+        }
+
+        let stage_paused = storage::airdrop::get_paused(&env)?;
+        if stage_paused {
+            return Err(ContractError::AirdropPaused {});
+        }
+
+        let res = storage::claim::get_user_claim(&env, recipient.clone());
+        if res.is_ok() {
+            return Err(ContractError::AlreadyClaimed {});
+        }
+
+        // TODO: Verify merkle proof
+
+        let total_claimed = storage::claim::get_total_claimed(&env);
+        storage::claim::set_total_claimed(&env, total_claimed + amount);
+
+        storage::claim::set_user_claim(&env, recipient.clone(), amount);
+
+        let config: storage::config::Config = storage::config::get_config(&env)?;
+        let token_contract = token::Client::new(&env, &config.token_address);
+        token_contract.transfer(&env.current_contract_address(), &recipient, &amount);
+
         Ok(())
     }
 
