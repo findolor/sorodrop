@@ -4,7 +4,7 @@ use crate::{
     error::ContractError,
     msg::{AirdropResponse, InvokeMsg, QueryMsg},
     storage,
-    utils::check_timestamp_validity,
+    utils::{check_timestamp_validity, get_airdrop_amounts, is_airdrop_ended, is_airdrop_started},
 };
 
 #[contract]
@@ -74,22 +74,16 @@ impl InvokeMsg for SorodropAirdrop {
 
         recipient.require_auth();
 
-        let current_timestamp = env.ledger().timestamp();
-
-        if let Some(start_time) = storage::airdrop::get_start_time(&env)? {
-            if current_timestamp < start_time {
-                return Err(ContractError::AirdropNotBegun {});
-            }
-        }
-        if let Some(end_time) = storage::airdrop::get_end_time(&env)? {
-            if current_timestamp > end_time {
-                return Err(ContractError::AirdropExpired {});
-            }
-        }
-
-        let stage_paused = storage::airdrop::get_paused(&env)?;
-        if stage_paused {
+        if storage::airdrop::get_paused(&env)? {
             return Err(ContractError::AirdropPaused {});
+        }
+
+        let current_timestamp = env.ledger().timestamp();
+        if !is_airdrop_started(&env, current_timestamp)? {
+            return Err(ContractError::AirdropNotBegun {});
+        }
+        if is_airdrop_ended(&env, current_timestamp)? {
+            return Err(ContractError::AirdropExpired {});
         }
 
         let res = storage::claim::get_user_claim(&env, recipient.clone());
@@ -112,6 +106,31 @@ impl InvokeMsg for SorodropAirdrop {
     }
 
     fn burn(env: Env, amount: i128) -> Result<(), ContractError> {
+        let config = storage::config::get_config(&env)?;
+
+        config.admin.require_auth();
+
+        let current_timestamp = env.ledger().timestamp();
+        if !is_airdrop_ended(&env, current_timestamp)? {
+            return Err(ContractError::AirdropNotExpired {});
+        }
+
+        let (_, _, admin_claim_amount, remaining_amount) = get_airdrop_amounts(&env)?;
+        if amount > remaining_amount {
+            return Err(ContractError::InsufficientBalance {});
+        }
+
+        let token_contract = token::Client::new(&env, &config.token_address);
+
+        let balance = token_contract.balance(&env.current_contract_address());
+        if balance < amount {
+            return Err(ContractError::InsufficientBalance {});
+        }
+
+        storage::claim::set_admin_claim(&env, admin_claim_amount + amount);
+
+        token_contract.burn(&env.current_contract_address(), &amount);
+
         Ok(())
     }
 
