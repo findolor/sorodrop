@@ -18,4 +18,7 @@ pub enum ContractError {
     AirdropExpired = 9,
     AirdropNotExpired = 10,
     AirdropPaused = 11,
+    AirdropNotPaused = 12,
+    // Balance errors
+    InsufficientBalance = 13,
 }
