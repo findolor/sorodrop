@@ -9,7 +9,13 @@ pub enum ContractError {
     AlreadyInitialized = 2,
     // Claim errors
     UserClaimNotFound = 3,
-    // Time period errors
+    AlreadyClaimed = 6,
+    // Time errors
     InvalidStartTime = 4,
     InvalidEndTime = 5,
+    // Airdrop errors
+    AirdropNotBegun = 8,
+    AirdropExpired = 9,
+    AirdropNotExpired = 10,
+    AirdropPaused = 11,
 }
