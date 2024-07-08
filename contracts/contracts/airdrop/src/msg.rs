@@ -2,6 +2,11 @@ use soroban_sdk::{contracttype, Address, BytesN, Env, Vec};
 
 use crate::{error::ContractError, storage};
 
+pub enum PostAirdropProcess {
+    Burn,
+    Clawback,
+}
+
 pub trait InvokeMsg {
     fn initialize(env: Env, admin: Address, token_address: Address) -> Result<(), ContractError>;
 

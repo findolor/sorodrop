@@ -2,9 +2,12 @@ use soroban_sdk::{contract, contractimpl, token, Address, BytesN, Env, Vec};
 
 use crate::{
     error::ContractError,
-    msg::{AirdropResponse, InvokeMsg, QueryMsg},
+    msg::{self, AirdropResponse, InvokeMsg, QueryMsg},
     storage,
-    utils::{check_timestamp_validity, get_airdrop_amounts, is_airdrop_ended, is_airdrop_started},
+    utils::{
+        check_timestamp_validity, get_airdrop_amounts, is_airdrop_ended, is_airdrop_started,
+        process_post_airdrop,
+    },
 };
 
 #[contract]
@@ -54,12 +57,11 @@ impl InvokeMsg for SorodropAirdrop {
         storage::airdrop::set_end_time(&env, end_time);
 
         storage::airdrop::set_paused(&env, false);
-
         storage::airdrop::set_amount(&env, total_amount);
 
-        storage::claim::set_total_claimed(&env, 0);
-
-        storage::claim::set_admin_claim(&env, 0);
+        storage::amount::set_admin_claim(&env, 0);
+        storage::amount::set_total_claimed(&env, 0);
+        storage::amount::set_burned(&env, 0);
 
         Ok(())
     }
@@ -86,17 +88,16 @@ impl InvokeMsg for SorodropAirdrop {
             return Err(ContractError::AirdropExpired {});
         }
 
-        let res = storage::claim::get_user_claim(&env, recipient.clone());
-        if res.is_ok() {
+        if storage::amount::get_user_claim(&env, recipient.clone()).is_ok() {
             return Err(ContractError::AlreadyClaimed {});
         }
 
         // TODO: Verify merkle proof
 
-        let total_claimed = storage::claim::get_total_claimed(&env);
-        storage::claim::set_total_claimed(&env, total_claimed + amount);
+        let total_claimed = storage::amount::get_total_claimed(&env)?;
+        storage::amount::set_total_claimed(&env, total_claimed + amount);
 
-        storage::claim::set_user_claim(&env, recipient.clone(), amount);
+        storage::amount::set_user_claim(&env, recipient.clone(), amount);
 
         let config: storage::config::Config = storage::config::get_config(&env)?;
         let token_contract = token::Client::new(&env, &config.token_address);
@@ -110,24 +111,12 @@ impl InvokeMsg for SorodropAirdrop {
 
         config.admin.require_auth();
 
-        let current_timestamp = env.ledger().timestamp();
-        if !is_airdrop_ended(&env, current_timestamp)? {
-            return Err(ContractError::AirdropNotExpired {});
-        }
-
-        let (_, _, admin_claim_amount, remaining_amount) = get_airdrop_amounts(&env)?;
-        if amount > remaining_amount {
-            return Err(ContractError::InsufficientBalance {});
-        }
-
         let token_contract = token::Client::new(&env, &config.token_address);
 
-        let balance = token_contract.balance(&env.current_contract_address());
-        if balance < amount {
-            return Err(ContractError::InsufficientBalance {});
-        }
+        let burned_amount =
+            process_post_airdrop(&env, &token_contract, msg::PostAirdropProcess::Burn, amount)?;
 
-        storage::claim::set_admin_claim(&env, admin_claim_amount + amount);
+        storage::amount::set_burned(&env, burned_amount + amount);
 
         token_contract.burn(&env.current_contract_address(), &amount);
 
@@ -135,6 +124,23 @@ impl InvokeMsg for SorodropAirdrop {
     }
 
     fn clawback(env: Env, recipient: Address, amount: i128) -> Result<(), ContractError> {
+        let config = storage::config::get_config(&env)?;
+
+        config.admin.require_auth();
+
+        let token_contract = token::Client::new(&env, &config.token_address);
+
+        let admin_claim_amount = process_post_airdrop(
+            &env,
+            &token_contract,
+            msg::PostAirdropProcess::Clawback,
+            amount,
+        )?;
+
+        storage::amount::set_admin_claim(&env, admin_claim_amount + amount);
+
+        token_contract.transfer(&env.current_contract_address(), &recipient, &amount);
+
         Ok(())
     }
 
@@ -173,19 +179,16 @@ impl QueryMsg for SorodropAirdrop {
     }
 
     fn get_is_claimed(env: Env, recipient: Address) -> Result<bool, ContractError> {
-        Ok(storage::claim::get_user_claim(&env, recipient).is_ok())
+        Ok(storage::amount::get_user_claim(&env, recipient).is_ok())
     }
 
     fn get_total_claimed(env: Env) -> Result<i128, ContractError> {
-        Ok(storage::claim::get_total_claimed(&env))
+        Ok(storage::amount::get_total_claimed(&env)?)
     }
 
     fn get_remaining_amount(env: Env) -> Result<i128, ContractError> {
-        let total_amount = storage::airdrop::get_amount(&env)?;
-        let total_claimed = storage::claim::get_total_claimed(&env);
-        let admin_claim = storage::claim::get_admin_claim(&env)?;
-
-        Ok(total_amount - total_claimed - admin_claim)
+        let (_, _, _, _, remaining_amount) = get_airdrop_amounts(&env)?;
+        Ok(remaining_amount)
     }
 
     fn get_is_paused(env: Env) -> Result<bool, ContractError> {

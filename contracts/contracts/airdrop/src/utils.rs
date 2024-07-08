@@ -1,6 +1,6 @@
-use soroban_sdk::Env;
+use soroban_sdk::{token, Env};
 
-use crate::{error::ContractError, storage};
+use crate::{error::ContractError, msg, storage};
 
 pub fn check_timestamp_validity(
     env: &Env,
@@ -40,14 +40,43 @@ pub fn is_airdrop_ended(env: &Env, current_timestamp: u64) -> Result<bool, Contr
     Ok(true)
 }
 
-pub fn get_airdrop_amounts(env: &Env) -> Result<(i128, i128, i128, i128), ContractError> {
+pub fn get_airdrop_amounts(env: &Env) -> Result<(i128, i128, i128, i128, i128), ContractError> {
     let total_amount = storage::airdrop::get_amount(&env)?;
-    let total_claimed = storage::claim::get_total_claimed(&env);
-    let admin_claim = storage::claim::get_admin_claim(&env)?;
+    let admin_claim = storage::amount::get_admin_claim(&env)?;
+    let total_claimed = storage::amount::get_total_claimed(&env)?;
+    let burned = storage::amount::get_burned(&env)?;
     Ok((
         total_amount,
-        total_claimed,
         admin_claim,
-        total_amount - total_claimed - admin_claim,
+        total_claimed,
+        burned,
+        total_amount - total_claimed - admin_claim - burned,
     ))
+}
+
+pub fn process_post_airdrop(
+    env: &Env,
+    token_contract: &token::TokenClient,
+    process: msg::PostAirdropProcess,
+    amount: i128,
+) -> Result<i128, ContractError> {
+    let current_timestamp = env.ledger().timestamp();
+    if !is_airdrop_ended(&env, current_timestamp)? {
+        return Err(ContractError::AirdropNotExpired {});
+    }
+
+    let (_, admin_claim_amount, _, burned_amount, remaining_amount) = get_airdrop_amounts(&env)?;
+    if amount > remaining_amount {
+        return Err(ContractError::InsufficientBalance {});
+    }
+
+    let balance = token_contract.balance(&env.current_contract_address());
+    if balance < amount {
+        return Err(ContractError::InsufficientBalance {});
+    }
+
+    match process {
+        msg::PostAirdropProcess::Burn => Ok(burned_amount),
+        msg::PostAirdropProcess::Clawback => Ok(admin_claim_amount),
+    }
 }

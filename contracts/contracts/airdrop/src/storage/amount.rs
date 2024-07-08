@@ -8,6 +8,7 @@ enum DataKey {
     UserClaim(Address),
     AdminClaim,
     TotalClaimed,
+    Burned,
 }
 
 // ========== USER CLAIM ==========
@@ -40,7 +41,7 @@ pub fn set_total_claimed(env: &Env, amount: i128) {
         .set(&DataKey::TotalClaimed, &amount);
 }
 
-pub fn get_total_claimed(env: &Env) -> i128 {
+pub fn get_total_claimed(env: &Env) -> Result<i128, ContractError> {
     env.storage()
         .instance()
         .get(&DataKey::TotalClaimed)
@@ -55,4 +56,14 @@ pub fn set_admin_claim(env: &Env, amount: i128) {
 
 pub fn get_admin_claim(env: &Env) -> Result<i128, ContractError> {
     env.storage().instance().get(&DataKey::AdminClaim).unwrap()
+}
+
+// ========== BURNED AMOUNT ==========
+
+pub fn set_burned(env: &Env, amount: i128) {
+    env.storage().instance().set(&DataKey::Burned, &amount);
+}
+
+pub fn get_burned(env: &Env) -> Result<i128, ContractError> {
+    env.storage().instance().get(&DataKey::Burned).unwrap()
 }

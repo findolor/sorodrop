@@ -1,3 +1,3 @@
 pub mod airdrop;
-pub mod claim;
+pub mod amount;
 pub mod config;
