@@ -6,7 +6,7 @@ use crate::{
     storage,
     utils::{
         check_timestamp_validity, get_airdrop_amounts, is_airdrop_ended, is_airdrop_started,
-        process_post_airdrop,
+        process_post_airdrop, verify_merkle_proofs,
     },
 };
 
@@ -49,7 +49,7 @@ impl InvokeMsg for SorodropAirdrop {
         let config = storage::config::get_config(&env)?;
         config.admin.require_auth();
 
-        // TODO: Save merkle root
+        storage::airdrop::set_root(&env, merkle_root);
 
         check_timestamp_validity(&env, start_time, end_time)?;
 
@@ -92,7 +92,7 @@ impl InvokeMsg for SorodropAirdrop {
             return Err(ContractError::AlreadyClaimed {});
         }
 
-        // TODO: Verify merkle proof
+        verify_merkle_proofs(&env, &recipient, &amount, merkle_proofs)?;
 
         let total_claimed = storage::amount::get_total_claimed(&env)?;
         storage::amount::set_total_claimed(&env, total_claimed + amount);
