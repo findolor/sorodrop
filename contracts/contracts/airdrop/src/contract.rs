@@ -171,10 +171,10 @@ impl QueryMsg for SorodropAirdrop {
 
     fn get_airdrop(env: Env) -> Result<AirdropResponse, ContractError> {
         Ok(AirdropResponse {
-            merkle_root: BytesN::from_array(&env, &[0; 32]),
-            total_amount: 0,
-            start: None,
-            expiration: None,
+            merkle_root: storage::airdrop::get_root(&env)?,
+            total_amount: storage::airdrop::get_amount(&env)?,
+            start: storage::airdrop::get_start_time(&env)?,
+            end: storage::airdrop::get_end_time(&env)?,
         })
     }
 
