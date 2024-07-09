@@ -1,14 +1,32 @@
-use soroban_sdk::{contracttype, Env};
+use soroban_sdk::{contracttype, BytesN, Env};
 
 use crate::error::ContractError;
 
 #[derive(Clone)]
 #[contracttype]
 enum DataKey {
+    MerkleRoot,
     StartTime,
     EndTime,
     Amount,
     Paused,
+}
+
+/* MERKLE ROOT */
+
+pub fn set_root(env: &Env, root: BytesN<32>) {
+    env.storage().instance().set(&DataKey::MerkleRoot, &root);
+}
+
+pub fn get_root(env: &Env) -> Result<BytesN<32>, ContractError> {
+    if !root_exists(env) {
+        return Err(ContractError::MerkleRootNotFound);
+    }
+    env.storage().instance().get(&DataKey::MerkleRoot).unwrap()
+}
+
+pub fn root_exists(e: &Env) -> bool {
+    e.storage().instance().has(&DataKey::MerkleRoot)
 }
 
 /* START TIME */
