@@ -1,4 +1,7 @@
-use soroban_sdk::{token, Env};
+use sha2::Digest;
+use soroban_sdk::{token, Address, BytesN, Env, Vec};
+
+extern crate alloc;
 
 use crate::{error::ContractError, msg, storage};
 
@@ -79,4 +82,46 @@ pub fn process_post_airdrop(
         msg::PostAirdropProcess::Burn => Ok(burned_amount),
         msg::PostAirdropProcess::Clawback => Ok(admin_claim_amount),
     }
+}
+
+pub fn verify_merkle_proofs(
+    env: &Env,
+    recipient: &Address,
+    amount: &i128,
+    merkle_proofs: Vec<BytesN<32>>,
+) -> Result<(), ContractError> {
+    let mut recipient_slice = [0u8; 56];
+    recipient.to_string().copy_into_slice(&mut recipient_slice);
+    let recipient_str = alloc::str::from_utf8(&recipient_slice)?;
+
+    let input_formatted = alloc::format!("{}{}", recipient_str, amount);
+    let input = input_formatted.as_bytes();
+
+    let hash: [u8; 32] = sha2::Sha256::digest(input)
+        .as_slice()
+        .try_into()
+        .map_err(|_| ContractError::HexError)?;
+
+    let hash = merkle_proofs.into_iter().try_fold(hash, |hash, p| {
+        let mut proof_buf: [u8; 32] = [0; 32];
+        p.copy_into_slice(&mut proof_buf);
+
+        let mut hashes = [hash, proof_buf];
+        hashes.sort_unstable();
+        sha2::Sha256::digest(&hashes.concat())
+            .as_slice()
+            .try_into()
+            .map_err(|_| ContractError::MerkleVerificationFailed {})
+    })?;
+
+    let merkle_root = storage::airdrop::get_root(&env)?;
+
+    let mut root_buf: [u8; 32] = [0; 32];
+    merkle_root.copy_into_slice(&mut root_buf);
+
+    if root_buf != hash {
+        return Err(ContractError::MerkleVerificationFailed {});
+    }
+
+    Ok(())
 }
