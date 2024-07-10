@@ -52,6 +52,34 @@ fn error_not_initialized() {
 }
 
 #[test]
+fn error_airdrop_paused() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let admin = Address::generate(&env);
+    let (_, token_address) = helpers::create_token_contract(&env, &admin);
+    let (contract, _) = helpers::create_and_initialize_contract(&env, admin, token_address);
+
+    contract.register_airdrop(
+        &test_data::get_merkle_root(&env),
+        &test_data::TOTAL_AMOUNT,
+        &None,
+        &None,
+    );
+
+    contract.pause();
+
+    assert_eq!(
+        contract.try_claim(
+            &test_data::get_account_address(&env, test_data::ACCOUNT_1),
+            &test_data::ACCOUNT_1_ALLOCATION,
+            &test_data::get_merkle_proofs(&env, test_data::ACCOUNT_1),
+        ),
+        Err(Ok(ContractError::AirdropPaused {}))
+    )
+}
+
+#[test]
 fn error_airdrop_not_begun() {
     let env = Env::default();
     env.mock_all_auths();
@@ -102,34 +130,6 @@ fn error_airdrop_expired() {
             &test_data::get_merkle_proofs(&env, test_data::ACCOUNT_1),
         ),
         Err(Ok(ContractError::AirdropExpired {}))
-    )
-}
-
-#[test]
-fn error_airdrop_paused() {
-    let env = Env::default();
-    env.mock_all_auths();
-
-    let admin = Address::generate(&env);
-    let (_, token_address) = helpers::create_token_contract(&env, &admin);
-    let (contract, _) = helpers::create_and_initialize_contract(&env, admin, token_address);
-
-    contract.register_airdrop(
-        &test_data::get_merkle_root(&env),
-        &test_data::TOTAL_AMOUNT,
-        &None,
-        &None,
-    );
-
-    contract.pause();
-
-    assert_eq!(
-        contract.try_claim(
-            &test_data::get_account_address(&env, test_data::ACCOUNT_1),
-            &test_data::ACCOUNT_1_ALLOCATION,
-            &test_data::get_merkle_proofs(&env, test_data::ACCOUNT_1),
-        ),
-        Err(Ok(ContractError::AirdropPaused {}))
     )
 }
 

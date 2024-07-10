@@ -25,7 +25,10 @@ pub fn check_timestamp_validity(
     Ok(())
 }
 
-pub fn is_airdrop_started(env: &Env, current_timestamp: u64) -> Result<Option<bool>, ContractError> {
+pub fn is_airdrop_started(
+    env: &Env,
+    current_timestamp: u64,
+) -> Result<Option<bool>, ContractError> {
     if let Some(start_time) = storage::airdrop::get_start_time(&env)? {
         return Ok(Some(current_timestamp >= start_time));
     }
@@ -34,7 +37,7 @@ pub fn is_airdrop_started(env: &Env, current_timestamp: u64) -> Result<Option<bo
 
 pub fn is_airdrop_ended(env: &Env, current_timestamp: u64) -> Result<Option<bool>, ContractError> {
     if let Some(end_time) = storage::airdrop::get_end_time(&env)? {
-        return Ok(Some(current_timestamp >= end_time))
+        return Ok(Some(current_timestamp >= end_time));
     }
     Ok(None)
 }
