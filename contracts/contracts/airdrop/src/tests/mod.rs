@@ -14,3 +14,4 @@ mod claim;
 mod helpers;
 mod initialize;
 mod register_airdrop;
+mod update_config;
