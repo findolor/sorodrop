@@ -81,11 +81,15 @@ impl InvokeMsg for SorodropAirdrop {
         }
 
         let current_timestamp = env.ledger().timestamp();
-        if !is_airdrop_started(&env, current_timestamp)? {
-            return Err(ContractError::AirdropNotBegun {});
+        if let Some(is_airdrop_started) = is_airdrop_started(&env, current_timestamp)? {
+            if !is_airdrop_started {
+                return Err(ContractError::AirdropNotBegun {});
+            }
         }
-        if is_airdrop_ended(&env, current_timestamp)? {
-            return Err(ContractError::AirdropExpired {});
+        if let Some(is_airdrop_ended) = is_airdrop_ended(&env, current_timestamp)? {
+            if is_airdrop_ended {
+                return Err(ContractError::AirdropExpired {});
+            }
         }
 
         if storage::amount::get_user_claim(&env, recipient.clone()).is_ok() {

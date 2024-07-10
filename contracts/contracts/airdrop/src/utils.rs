@@ -1,5 +1,5 @@
 use sha2::Digest;
-use soroban_sdk::{token, Address, BytesN, Env, Vec};
+use soroban_sdk::{log, token, Address, BytesN, Env, Vec};
 
 extern crate alloc;
 
@@ -25,22 +25,18 @@ pub fn check_timestamp_validity(
     Ok(())
 }
 
-pub fn is_airdrop_started(env: &Env, current_timestamp: u64) -> Result<bool, ContractError> {
+pub fn is_airdrop_started(env: &Env, current_timestamp: u64) -> Result<Option<bool>, ContractError> {
     if let Some(start_time) = storage::airdrop::get_start_time(&env)? {
-        if current_timestamp < start_time {
-            return Ok(false);
-        }
+        return Ok(Some(current_timestamp >= start_time));
     }
-    Ok(true)
+    Ok(None)
 }
 
-pub fn is_airdrop_ended(env: &Env, current_timestamp: u64) -> Result<bool, ContractError> {
+pub fn is_airdrop_ended(env: &Env, current_timestamp: u64) -> Result<Option<bool>, ContractError> {
     if let Some(end_time) = storage::airdrop::get_end_time(&env)? {
-        if current_timestamp < end_time {
-            return Ok(false);
-        }
+        return Ok(Some(current_timestamp >= end_time))
     }
-    Ok(true)
+    Ok(None)
 }
 
 pub fn get_airdrop_amounts(env: &Env) -> Result<(i128, i128, i128, i128, i128), ContractError> {
@@ -64,8 +60,11 @@ pub fn process_post_airdrop(
     amount: i128,
 ) -> Result<i128, ContractError> {
     let current_timestamp = env.ledger().timestamp();
-    if !is_airdrop_ended(&env, current_timestamp)? {
-        return Err(ContractError::AirdropNotExpired {});
+
+    match is_airdrop_ended(&env, current_timestamp)? {
+        Some(true) => return Err(ContractError::AirdropExpired {}),
+        Some(false) => {}
+        None => return Err(ContractError::AirdropIsIndefinite),
     }
 
     let (_, admin_claim_amount, _, burned_amount, remaining_amount) = get_airdrop_amounts(&env)?;

@@ -21,14 +21,15 @@ pub enum ContractError {
     AirdropNotExpired = 10,
     AirdropPaused = 11,
     AirdropNotPaused = 12,
+    AirdropIsIndefinite = 13,
     // Balance errors
-    InsufficientBalance = 13,
+    InsufficientBalance = 14,
     // Merkle errors
-    MerkleRootNotFound = 14,
-    MerkleVerificationFailed = 15,
+    MerkleRootNotFound = 15,
+    MerkleVerificationFailed = 16,
     // External errors
-    HexError = 16,
-    Utf8Error = 17,
+    HexError = 17,
+    Utf8Error = 18,
 }
 impl From<HexError> for ContractError {
     fn from(_: HexError) -> Self {
