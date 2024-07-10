@@ -72,7 +72,7 @@ impl InvokeMsg for SorodropAirdrop {
         amount: i128,
         merkle_proofs: Vec<BytesN<32>>,
     ) -> Result<(), ContractError> {
-        storage::config::get_config(&env)?;
+        let config = storage::config::get_config(&env)?;
 
         recipient.require_auth();
 
@@ -103,7 +103,6 @@ impl InvokeMsg for SorodropAirdrop {
 
         storage::amount::set_user_claim(&env, recipient.clone(), amount);
 
-        let config: storage::config::Config = storage::config::get_config(&env)?;
         let token_contract = token::Client::new(&env, &config.token_address);
         token_contract.transfer(&env.current_contract_address(), &recipient, &amount);
 
