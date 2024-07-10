@@ -7,7 +7,7 @@ fn happy_path() {
 
     let admin = Address::generate(&env);
     let (_, token_address) = helpers::create_token_contract(&env, &admin);
-    let (contract, _) = helpers::create_and_initialize_contract(&env, admin, token_address);
+    let (contract, _) = helpers::create_and_initialize_contract(&env, &admin, &token_address);
 
     let new_admin = Address::generate(&env);
     let new_token_address = Address::generate(&env);

@@ -7,7 +7,7 @@ fn happy_path() {
 
     let admin = Address::generate(&env);
     let (contract, _) =
-        helpers::create_and_initialize_contract(&env, admin, Address::generate(&env));
+        helpers::create_and_initialize_contract(&env, &admin, &Address::generate(&env));
 
     contract.register_airdrop(
         &test_data::get_merkle_root(&env),
@@ -51,7 +51,7 @@ fn error_invalid_start_time() {
 
     let admin = Address::generate(&env);
     let (contract, _) =
-        helpers::create_and_initialize_contract(&env, admin, Address::generate(&env));
+        helpers::create_and_initialize_contract(&env, &admin, &Address::generate(&env));
 
     assert_eq!(
         contract.try_register_airdrop(
@@ -82,7 +82,7 @@ fn error_invalid_expiration_time() {
 
     let admin = Address::generate(&env);
     let (contract, _) =
-        helpers::create_and_initialize_contract(&env, admin, Address::generate(&env));
+        helpers::create_and_initialize_contract(&env, &admin, &Address::generate(&env));
 
     assert_eq!(
         contract.try_register_airdrop(

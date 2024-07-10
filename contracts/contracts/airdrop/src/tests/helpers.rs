@@ -11,14 +11,14 @@ pub fn create_contract(e: &Env) -> (SorodropAirdropClient, Address) {
     (SorodropAirdropClient::new(&e, address), address.clone())
 }
 
-pub fn create_and_initialize_contract(
+pub fn create_and_initialize_contract<'a>(
     e: &Env,
-    admin: Address,
-    token_address: Address,
-) -> (SorodropAirdropClient, Address) {
+    admin: &Address,
+    token_address: &Address,
+) -> (SorodropAirdropClient<'a>, Address) {
     let address = &e.register_contract(None, SorodropAirdrop {});
     let contract = SorodropAirdropClient::new(&e, address);
-    contract.initialize(&admin, &token_address);
+    contract.initialize(admin, token_address);
     (contract, address.clone())
 }
 

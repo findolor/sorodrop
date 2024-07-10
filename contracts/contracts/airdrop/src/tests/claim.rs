@@ -8,7 +8,7 @@ fn happy_path() {
     let admin = Address::generate(&env);
     let (token_contract, token_address) = helpers::create_token_contract(&env, &admin);
     let (contract, contract_address) =
-        helpers::create_and_initialize_contract(&env, admin, token_address);
+        helpers::create_and_initialize_contract(&env, &admin, &token_address);
 
     contract.register_airdrop(
         &test_data::get_merkle_root(&env),
@@ -58,7 +58,7 @@ fn error_airdrop_paused() {
 
     let admin = Address::generate(&env);
     let (_, token_address) = helpers::create_token_contract(&env, &admin);
-    let (contract, _) = helpers::create_and_initialize_contract(&env, admin, token_address);
+    let (contract, _) = helpers::create_and_initialize_contract(&env, &admin, &token_address);
 
     contract.register_airdrop(
         &test_data::get_merkle_root(&env),
@@ -86,7 +86,7 @@ fn error_airdrop_not_begun() {
 
     let admin = Address::generate(&env);
     let (_, token_address) = helpers::create_token_contract(&env, &admin);
-    let (contract, _) = helpers::create_and_initialize_contract(&env, admin, token_address);
+    let (contract, _) = helpers::create_and_initialize_contract(&env, &admin, &token_address);
 
     contract.register_airdrop(
         &test_data::get_merkle_root(&env),
@@ -112,7 +112,7 @@ fn error_airdrop_expired() {
 
     let admin = Address::generate(&env);
     let (_, token_address) = helpers::create_token_contract(&env, &admin);
-    let (contract, _) = helpers::create_and_initialize_contract(&env, admin, token_address);
+    let (contract, _) = helpers::create_and_initialize_contract(&env, &admin, &token_address);
 
     contract.register_airdrop(
         &test_data::get_merkle_root(&env),
@@ -141,7 +141,7 @@ fn error_already_claimed() {
     let admin = Address::generate(&env);
     let (token_contract, token_address) = helpers::create_token_contract(&env, &admin);
     let (contract, contract_address) =
-        helpers::create_and_initialize_contract(&env, admin, token_address);
+        helpers::create_and_initialize_contract(&env, &admin, &token_address);
 
     contract.register_airdrop(
         &test_data::get_merkle_root(&env),
@@ -176,7 +176,7 @@ fn error_merkle_verification_failed() {
     let admin = Address::generate(&env);
     let (token_contract, token_address) = helpers::create_token_contract(&env, &admin);
     let (contract, contract_address) =
-        helpers::create_and_initialize_contract(&env, admin, token_address);
+        helpers::create_and_initialize_contract(&env, &admin, &token_address);
 
     contract.register_airdrop(
         &test_data::get_merkle_root(&env),
