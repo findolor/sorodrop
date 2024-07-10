@@ -10,6 +10,7 @@ use crate::{
 
 mod test_data;
 
+mod claim;
 mod helpers;
 mod initialize;
 mod register_airdrop;
