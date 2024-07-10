@@ -169,7 +169,7 @@ impl InvokeMsg for SorodropAirdrop {
 #[contractimpl]
 impl QueryMsg for SorodropAirdrop {
     fn get_config(env: Env) -> Result<storage::config::Config, ContractError> {
-        Ok(storage::config::get_config(&env)?)
+        storage::config::get_config(&env)
     }
 
     fn get_airdrop(env: Env) -> Result<AirdropResponse, ContractError> {
@@ -186,7 +186,7 @@ impl QueryMsg for SorodropAirdrop {
     }
 
     fn get_total_claimed(env: Env) -> Result<i128, ContractError> {
-        Ok(storage::amount::get_total_claimed(&env)?)
+        storage::amount::get_total_claimed(&env)
     }
 
     fn get_remaining_amount(env: Env) -> Result<i128, ContractError> {
@@ -195,6 +195,6 @@ impl QueryMsg for SorodropAirdrop {
     }
 
     fn get_is_paused(env: Env) -> Result<bool, ContractError> {
-        Ok(storage::airdrop::get_paused(&env)?)
+        storage::airdrop::get_paused(&env)
     }
 }

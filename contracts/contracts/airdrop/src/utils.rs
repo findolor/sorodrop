@@ -29,24 +29,24 @@ pub fn is_airdrop_started(
     env: &Env,
     current_timestamp: u64,
 ) -> Result<Option<bool>, ContractError> {
-    if let Some(start_time) = storage::airdrop::get_start_time(&env)? {
+    if let Some(start_time) = storage::airdrop::get_start_time(env)? {
         return Ok(Some(current_timestamp >= start_time));
     }
     Ok(None)
 }
 
 pub fn is_airdrop_ended(env: &Env, current_timestamp: u64) -> Result<Option<bool>, ContractError> {
-    if let Some(end_time) = storage::airdrop::get_end_time(&env)? {
+    if let Some(end_time) = storage::airdrop::get_end_time(env)? {
         return Ok(Some(current_timestamp >= end_time));
     }
     Ok(None)
 }
 
 pub fn get_airdrop_amounts(env: &Env) -> Result<(i128, i128, i128, i128, i128), ContractError> {
-    let total_amount = storage::airdrop::get_amount(&env)?;
-    let admin_claim = storage::amount::get_admin_claim(&env)?;
-    let total_claimed = storage::amount::get_total_claimed(&env)?;
-    let burned = storage::amount::get_burned(&env)?;
+    let total_amount = storage::airdrop::get_amount(env)?;
+    let admin_claim = storage::amount::get_admin_claim(env)?;
+    let total_claimed = storage::amount::get_total_claimed(env)?;
+    let burned = storage::amount::get_burned(env)?;
     Ok((
         total_amount,
         admin_claim,
@@ -64,13 +64,13 @@ pub fn process_post_airdrop(
 ) -> Result<i128, ContractError> {
     let current_timestamp = env.ledger().timestamp();
 
-    match is_airdrop_ended(&env, current_timestamp)? {
+    match is_airdrop_ended(env, current_timestamp)? {
         Some(true) => {}
         Some(false) => return Err(ContractError::AirdropNotExpired {}),
         None => return Err(ContractError::AirdropIsIndefinite),
     }
 
-    let (_, admin_claim_amount, _, burned_amount, remaining_amount) = get_airdrop_amounts(&env)?;
+    let (_, admin_claim_amount, _, burned_amount, remaining_amount) = get_airdrop_amounts(env)?;
     if amount > remaining_amount {
         return Err(ContractError::InsufficientBalance {});
     }
@@ -110,13 +110,13 @@ pub fn verify_merkle_proofs(
 
         let mut hashes = [hash, proof_buf];
         hashes.sort_unstable();
-        sha2::Sha256::digest(&hashes.concat())
+        sha2::Sha256::digest(hashes.concat())
             .as_slice()
             .try_into()
             .map_err(|_| ContractError::MerkleVerificationFailed {})
     })?;
 
-    let merkle_root = storage::airdrop::get_root(&env)?;
+    let merkle_root = storage::airdrop::get_root(env)?;
 
     let mut root_buf: [u8; 32] = [0; 32];
     merkle_root.copy_into_slice(&mut root_buf);
