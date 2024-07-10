@@ -12,6 +12,7 @@ mod test_data;
 
 mod burn;
 mod claim;
+mod clawback;
 mod helpers;
 mod initialize;
 mod register_airdrop;
