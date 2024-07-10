@@ -1,5 +1,5 @@
 use sha2::Digest;
-use soroban_sdk::{log, token, Address, BytesN, Env, Vec};
+use soroban_sdk::{token, Address, BytesN, Env, Vec};
 
 extern crate alloc;
 
