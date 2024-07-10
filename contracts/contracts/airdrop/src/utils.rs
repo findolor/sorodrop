@@ -65,8 +65,8 @@ pub fn process_post_airdrop(
     let current_timestamp = env.ledger().timestamp();
 
     match is_airdrop_ended(&env, current_timestamp)? {
-        Some(true) => return Err(ContractError::AirdropExpired {}),
-        Some(false) => {}
+        Some(true) => {}
+        Some(false) => return Err(ContractError::AirdropNotExpired {}),
         None => return Err(ContractError::AirdropIsIndefinite),
     }
 
