@@ -23,10 +23,20 @@ fn happy_path() {
         token_contract.balance(&test_data::get_account_address(&env, test_data::ACCOUNT_1));
     assert_eq!(balance, 0);
 
+    assert_eq!(
+        contract.get_is_claimed(&test_data::get_account_address(&env, test_data::ACCOUNT_1)),
+        false
+    );
+
     contract.claim(
         &test_data::get_account_address(&env, test_data::ACCOUNT_1),
         &test_data::ACCOUNT_1_ALLOCATION,
         &test_data::get_merkle_proofs(&env, test_data::ACCOUNT_1),
+    );
+
+    assert_eq!(
+        contract.get_is_claimed(&test_data::get_account_address(&env, test_data::ACCOUNT_1)),
+        true
     );
 
     let balance =
