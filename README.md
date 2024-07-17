@@ -14,3 +14,8 @@ Sorodrop is a scalable and cost-effective solution for conducting large-scale ai
 
 ### Smart Contracts
 
+// TODO: Add smart contract deployment instructions
+
+### Sorodrop CLI
+
+// TODO: Add CLI installation instructions
