@@ -14,7 +14,7 @@ Sorodrop is a scalable and cost-effective solution for conducting large-scale ai
 
 ### Smart Contracts
 
-// TODO: Add smart contract deployment instructions
+Contracts folder contains the smart contracts for the Sorodrop airdrop tooling. The contracts are written with Soroban smart contract language. To learn more about Soroban, visit [their website](https://developers.stellar.org/docs/build/smart-contracts/overview).
 
 ### Scripts
 
