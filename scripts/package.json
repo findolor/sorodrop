@@ -2,6 +2,11 @@
   "name": "sorodrop-scripts",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "deploy": "./deploy.sh",
+    "merkle": "bun run calculateMerkle.ts",
+    "merkle:test": "bun run generateTestAccounts.ts && bun run calculateMerkle.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

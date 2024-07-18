@@ -16,6 +16,31 @@ Sorodrop is a scalable and cost-effective solution for conducting large-scale ai
 
 // TODO: Add smart contract deployment instructions
 
-### Sorodrop CLI
+### Scripts
 
-// TODO: Add CLI installation instructions
+Scripts folder contains some helper scripts that can be used to generate merkle root and merkle proofs for each recipient of an airdrop.
+
+`Bun` is used to manage dependencies and run scripts. To check out Bun and install it, visit [their website](https://bun.sh/).
+
+After installing Bun and project dependencies, you can run the following commands:
+
+#### Build and Deploy Smart Contracts
+
+```bash
+bun deploy
+```
+
+#### Generate Merkle Root and Merkle Proofs for Recipients
+
+1. Create a CSV file with recipient addresses and amounts.
+2. Run the following command:
+
+```bash
+bun merkle
+```
+
+#### Generate Merkle Root and Merkle Proofs for Recipients with Test Accounts
+
+```
+bun merkle:test
+```
