@@ -17,8 +17,8 @@ pub trait InvokeMsg {
         env: Env,
         merkle_root: BytesN<32>,
         total_amount: i128,
-        start: Option<u64>,
-        expiration: Option<u64>,
+        start_time: Option<u64>,
+        end_time: Option<u64>,
     ) -> Result<(), ContractError>;
 
     fn claim(
