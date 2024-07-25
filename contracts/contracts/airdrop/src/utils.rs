@@ -7,18 +7,18 @@ use crate::{error::ContractError, msg, storage};
 
 pub fn check_timestamp_validity(
     env: &Env,
-    start: Option<u64>,
-    expiration: Option<u64>,
+    start_time: Option<u64>,
+    end_time: Option<u64>,
 ) -> Result<(), ContractError> {
-    if let Some(start_time) = start {
+    if let Some(start_time) = start_time {
         let current_timestamp = env.ledger().timestamp();
         if current_timestamp >= start_time {
             return Err(ContractError::InvalidStartTime {});
         }
     }
-    if let Some(expiration_time) = expiration {
+    if let Some(end_time) = end_time {
         let current_timestamp = env.ledger().timestamp();
-        if current_timestamp >= expiration_time {
+        if current_timestamp >= end_time {
             return Err(ContractError::InvalidEndTime {});
         }
     }

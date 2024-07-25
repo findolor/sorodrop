@@ -176,8 +176,8 @@ impl QueryMsg for SorodropAirdrop {
         Ok(AirdropResponse {
             merkle_root: storage::airdrop::get_root(&env)?,
             total_amount: storage::airdrop::get_amount(&env)?,
-            start: storage::airdrop::get_start_time(&env)?,
-            end: storage::airdrop::get_end_time(&env)?,
+            start_time: storage::airdrop::get_start_time(&env)?,
+            end_time: storage::airdrop::get_end_time(&env)?,
         })
     }
 

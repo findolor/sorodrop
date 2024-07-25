@@ -42,8 +42,8 @@ pub trait InvokeMsg {
 pub struct AirdropResponse {
     pub merkle_root: BytesN<32>,
     pub total_amount: i128,
-    pub start: Option<u64>,
-    pub end: Option<u64>,
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
 }
 
 pub trait QueryMsg {

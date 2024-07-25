@@ -20,8 +20,8 @@ fn happy_path() {
 
     assert_eq!(response.merkle_root, test_data::get_merkle_root(&env));
     assert_eq!(response.total_amount, test_data::TOTAL_AMOUNT);
-    assert_eq!(response.start, None);
-    assert_eq!(response.end, None);
+    assert_eq!(response.start_time, None);
+    assert_eq!(response.end_time, None);
 }
 
 #[test]
@@ -74,7 +74,7 @@ fn error_invalid_start_time() {
 }
 
 #[test]
-fn error_invalid_expiration_time() {
+fn error_invalid_end_time() {
     let env = Env::default();
     env.mock_all_auths();
 
