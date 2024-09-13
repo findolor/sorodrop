@@ -106,12 +106,12 @@ export default function Home() {
 
       const positions = particles.attributes.position.array as Float32Array
       for (let i = 0; i < positions.length; i += 3) {
-        positions[i + 1] -= 0.1
+        positions[i + 1] -= 0.05 // Reduced from 0.1 to 0.05 to slow down the particles
         if (positions[i + 1] < -50) positions[i + 1] = 50
       }
       particles.attributes.position.needsUpdate = true
 
-      particleSystem.rotation.y += 0.0005
+      particleSystem.rotation.y += 0.0003 // Reduced from 0.0005 to 0.0003 to slow down the rotation
 
       renderer.render(scene, camera)
     }
