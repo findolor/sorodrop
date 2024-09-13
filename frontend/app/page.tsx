@@ -140,12 +140,8 @@ export default function Home() {
             Sorodrop
           </h1>
           <div className="flex space-x-4">
-            <a href="#" className="text-text-50">
-              <SocialIcon type="telegram" />
-            </a>
-            <a href="#" className="text-text-50">
-              <SocialIcon type="github" />
-            </a>
+            <SocialIcon type="telegram" />
+            <SocialIcon type="github" />
           </div>
         </div>
 
@@ -261,12 +257,8 @@ export default function Home() {
             Ready to simplify your airdrops?
           </h2>
           <div className="flex justify-center space-x-4">
-            <a href="#" className="text-text-50">
-              <SocialIcon type="telegram" />
-            </a>
-            <a href="#" className="text-text-50">
-              <SocialIcon type="github" />
-            </a>
+            <SocialIcon type="telegram" />
+            <SocialIcon type="github" />
           </div>
         </section>
 
