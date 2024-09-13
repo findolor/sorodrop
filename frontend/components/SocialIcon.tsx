@@ -7,7 +7,7 @@ type SocialIconProps = {
 const SocialIcon: React.FC<SocialIconProps> = ({ type }) => {
   if (type === "telegram") {
     return (
-      <a href="https://t.me/findolor">
+      <a href="https://t.me/findolor" target="_blank">
         <svg
           className="w-6 h-6"
           fill="currentColor"
@@ -20,7 +20,7 @@ const SocialIcon: React.FC<SocialIconProps> = ({ type }) => {
     )
   } else if (type === "github") {
     return (
-      <a href="https://github.com/findolor/sorodrop">
+      <a href="https://github.com/findolor/sorodrop" target="_blank">
         <svg
           className="w-6 h-6"
           fill="currentColor"
