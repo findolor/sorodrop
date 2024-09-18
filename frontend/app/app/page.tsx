@@ -3,13 +3,13 @@ import Link from "next/link"
 export default function ComingSoon() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background-950 text-text-100 p-4">
-      <h1 className="text-4xl sm:text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-orange-500/30 via-[#f2eef7] to-purple-500 leading-tight py-2">
+      <h1 className="text-4xl sm:text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-orange-500/30 via-[#f2eef7] to-purple-500 leading-tight py-2 text-center">
         Coming Soon
       </h1>
-      <p className="text-lg sm:text-xl mb-8 text-text-200">
+      <p className="text-lg sm:text-xl mb-8 text-text-200 text-center">
         We&apos;re working hard to bring you an amazing airdrop experience!
       </p>
-      <div className="animate-bounce">
+      <div className="animate-bounce flex justify-center w-full">
         <svg
           className="w-6 h-6 text-accent-500"
           fill="none"
